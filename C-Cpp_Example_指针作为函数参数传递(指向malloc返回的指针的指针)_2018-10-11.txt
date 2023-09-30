@@ -1,0 +1,116 @@
+C-Cpp指针作为函数参数传递(指向malloc返回的指针的指针)-博客园(怪猫良佐)
+
+2018-10-11 16:05
+
+--------------------------------------------------
+
+本文转载自：https://www.cnblogs.com/WeyneChen/p/6672045.html
+
+--------------------------------------------------
+
+函数参数传递的只能是数值，所以当指针作为函数参数传递时，传递的是指针的值，而不是地址。
+
+        #include "stdio.h"
+        void pointer(int *p)
+        {
+          int a = 11;
+          printf("\n\nEnter function");
+          printf("\nthe p is point to  %p , addr is %X, *p is %d",p , &p, *p);
+          *p =11;
+          printf("\nthe p is point to  %p , addr is %X, *p is %d",p , &p, *p);
+          p = &a;
+          printf("\nthe p is point to  %p , addr is %X, *p is %d",p , &p, *p);
+        
+          printf("\nfunction return\n");
+        }
+        
+        int main()
+        {
+         int b =22;
+         int *p = &b;
+        
+         printf("the b address %X\n",&b);
+         printf("the p is point to %p , addr is %X, *p is %d",p , &p, *p);
+         pointer(p);
+         printf("\nthe p is  point to %p , addr is %X, *p is %d\n",p , &p, *p);
+        }
+    
+    输出结果：
+    
+        the b address 28FF3C
+        the p is point to 0028FF3C , addr is 28FF38, *p is 22
+        
+        Enter function
+        the p is point to  0028FF3C , addr is 28FF20, *p is 22
+        the p is point to  0028FF3C , addr is 28FF20, *p is 11
+        the p is point to  0028FF0C , addr is 28FF20, *p is 11
+        function return
+        
+        the p is  point to 0028FF3C , addr is 28FF38, *p is 11
+    
+    1. %p为指针所指向的数据的地址，这里既为变量b的地址。
+    
+    2. 在没有进入pointer函数之前，变量p存储的值为28FF3C，变量p的地址为28FF38，*p的值等于b的值等于22
+    
+    3. 进入pointer之后，p所指向的内存地址没有改变，但是p自身的地址变了。
+    
+       意味着函数传递只是将28FF3C传递进来了。
+       
+       虽然这个指针变量名字还是叫做p，但与main函数中的指针变量已经不一样了。
+       
+       这意味着，你可以改变main函数中b的值，但是不能改变p的值
+
+--------------------------------------------------
+
+函数参数为指针的指针
+
+    先看一个例子：
+    
+        #include "stdio.h"
+        
+        void GetMemory(char *p,int num)
+        {
+            p=(char*)malloc(sizeof(char)*num); 
+        }
+        
+        void main()
+        {
+            char *str=NULL;
+            GetMemory(str,100); 
+            strcpy(str,"hello");
+            printf(str);
+        }
+    
+    GetMemory这个函数是调用malloc申请一块内存。乍一看好像没什么问题，编译也不会报错。
+    
+    但是运行起来，程序直接奔溃。 其实有了上面的分析就可以知道，GetMemeory中的p是不能改变str的指向的，也就是说str还是指向NULL。
+    
+    GetMemory中的P是临时申请的一个指针变量，当str传值进来(NULL)，时，p指向NULL，除此之外，没做任何改变。
+    
+    当运行malloc函数后，也只是将malloc返回的的指针地址赋给了p，并不能传递给str。所以这里就需要指针的指针了
+    
+        #include "stdio.h"
+        
+        void GetMemory(char **p,int num)
+        {
+            *p=(char*)malloc(sizeof(char)*num); 
+        }
+        
+        void main()
+        {
+            char *str=NULL;
+            GetMemory(&str,100); 
+            strcpy(str,"hello\n");
+            printf(str);
+        }
+    
+    这个时候就是将指针变量str的地址传递了过去，而不是将指针变量的值(NULL)传递了过去，因此就可以改变str的指向了。
+
+--------------------------------------------------
+
+分类: C++
+
+标签: C/C++
+
+--------------------------------------------------
+EOF

@@ -1,0 +1,236 @@
+C语言链表详解_CSDN(Violent-Ayang)
+
+2022-03-02 11:56:43
+
+--------------------------------------------------
+
+文章目录
+
+通过结构体构成链表，单向链表的建立，结点数据的输出、删除与插入
+
+    什么是链表?
+
+    创建单链表
+
+        静态创建单链表
+
+        动态创建单链表
+
+            1. 创建链表 (创建一个表头表示整个链表) 
+
+            2. 创建结点
+
+            3. 插入结点
+
+            4. 删除结点
+
+            5. 打印遍历链表 (做测试) 
+
+            完整代码
+
+--------------------------------------------------
+
+通过结构体构成链表，单向链表的建立，结点数据的输出、删除与插入
+
+--------------------------------------------------
+
+什么是链表?
+
+    * 链表是一种常用数据结构，他通过指针将一些数据结点，连接成一个数据链。相对于数组，链表具有更好的动态性 (非顺序存储) 链式存储
+    
+    * 数据域用来存储数据，指针域用于建立与下一个结点的联系
+    
+    * 建立链表时无需先知道数据总量的，可以随机的分配空间，可以高效的在链表中的任意位置实时插入和删除
+    
+    * 链表的开销，主要是访问顺序性和组织链的空间损失
+
+数组和链表的区别: 
+
+    数组: 
+    
+        一次性分配一块连续的存储区域
+    
+        优点: 
+        
+            随机访问元素效率高
+        
+        缺点: 
+        
+            * 需要分配一块连续的存储区域 (很大区域，有可能会分配失败) 
+            
+            * 删除或插入某个元素效率低
+    
+    链表: 
+    
+        无需一次性分配一块连续的存储区域，只需分配n块节点存储区域，通过指针建立关系
+    
+        优点: 
+        
+            * 不需要一块连续的存储区域
+            
+            * 删除和插入某个元素效率高
+        
+        缺点: 
+        
+            随机访问元素效率低
+
+--------------------------------------------------
+
+创建单链表
+
+    静态创建单链表
+    
+        #include<stdio.h>
+        
+        struct Node{
+            int data;//数据域 
+            struct Node* next;//指针域 
+        }; 
+         
+        int main()
+        {
+            struct Node node1 = {1,NULL}; 
+            struct Node node2 = {2,NULL}; 
+            struct Node node3 = {3,NULL}; 
+            node1.next = &node2;
+            node2.next = &node3;
+            return 0;
+        }
+
+--------------------------------------------------
+
+动态创建单链表
+
+    动态创建单链表: 动态内存申请+模块化设计
+
+    1. 创建链表 (创建一个表头表示整个链表) 
+    
+        //创建链表 
+        struct Node* createList(){
+            struct Node* headNode = (struct Node*)malloc(sizeof(struct Node));
+            //headNode 成为了结构体变量
+            //变量使用前必须被初始化
+            headNode->data = 1;
+            headNode->next = NULL;
+            return headNode; 
+        }
+    
+    2. 创建结点
+    
+        struct Node* createNode(int data){
+            struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+            newNode->data = data;
+            newNode->next = NULL;
+            return newNode;
+        }
+    
+    3. 插入结点
+    
+        //插入结点 
+        void insertNodeByHead(struct Node* headNode,int data){
+            //1.创建插入的结点
+            struct Node* newNode = createNode(data);
+            newNode->next = headNode->next;
+            headNode->next = newNode; 
+        }
+    
+    4. 删除结点
+    
+        void deleteNodeByAppoin(struct Node* headNode,int posData){
+            struct Node* posNode = headNode->next;
+            struct Node* posNodeFront = headNode;
+            if(!posNode){
+                printf("链表为空，无法删除链表");
+            }
+            while(posNode->data!=posData){
+                posNodeFront = posNode;
+                posNode = posNode->next;
+                if(!posNode){
+                    printf("没有找到要删除结点，无法删除");
+                    return;
+                }
+            }
+            posNodeFront->next = posNode->next;
+            free(posNode);
+        }
+    
+    5. 打印遍历链表 (做测试) 
+    
+        void printList(struct Node* headNode){
+            struct Node* pMove = headNode->next;
+            while(pMove){
+                printf("%d",pMove->data);
+                pMove = pMove->next;
+            }
+            printf("\n");
+
+--------------------------------------------------
+
+完整代码
+
+    #include<stdio.h>
+    #include<stdlib.h>
+    struct Node{
+        int data;//数据域 
+        struct Node* next;//指针域 
+    };
+    //创建链表 
+    struct Node* createList(){
+        struct Node* headNode = (struct Node*)malloc(sizeof(struct Node));
+        //headNode 成为了结构体变量
+        //变量使用前必须被初始化
+        headNode->data = 1;
+        headNode->next = NULL;
+        return headNode; 
+    }
+    struct Node* createNode(int data){
+        struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+        newNode->data = data;
+        newNode->next = NULL;
+        return newNode;
+    }
+    void printList(struct Node* headNode){
+        struct Node* pMove = headNode->next;
+        while(pMove){
+            printf("%d\t",pMove->data);
+            pMove = pMove->next;
+        }
+        printf("\n");
+    }
+    //插入结点 
+    void insertNodeByHead(struct Node* headNode,int data){
+        //1.创建插入的结点
+        struct Node* newNode = createNode(data);
+        newNode->next = headNode->next;
+        headNode->next = newNode; 
+    }
+    void deleteNodeByAppoin(struct Node* headNode,int posData){
+        struct Node* posNode = headNode->next;
+        struct Node* posNodeFront = headNode;
+        if(!posNode){
+            printf("链表为空，无法删除链表");
+        }
+        while(posNode->data!=posData){
+            posNodeFront = posNode;
+            posNode = posNode->next;
+            if(!posNode){
+                printf("没有找到要删除结点，无法删除");
+                return;
+            }
+        }
+        posNodeFront->next = posNode->next;
+        free(posNode);
+    }
+    int main()
+    {
+        struct Node* list = createList();
+        insertNodeByHead(list,1); 
+        insertNodeByHead(list,2); 
+        insertNodeByHead(list,3); 
+        deleteNodeByAppoin(list,2);
+        printList(list);
+        return 0;
+    }
+
+--------------------------------------------------
+EOF

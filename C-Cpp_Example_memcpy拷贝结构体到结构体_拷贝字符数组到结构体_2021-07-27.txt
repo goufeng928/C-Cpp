@@ -1,0 +1,47 @@
+C语言memcpy拷贝结构体到结构体_拷贝字符数组到结构体_华为云
+
+2021-07-27 00:36:32
+
+--------------------------------------------------
+
+1 memcpy
+
+    我们知道这个函数主要是拷贝内存数据，我们一般可以使用拷贝结构体到结构体、也可以拷贝字符数组到结构体，但是这个字符数组数据应该是同一个结构体拷贝先拷贝到这个字符数组，如果是其他格式的字符数组，这样拷贝就有问题。
+
+2 测试代码
+
+    #include <stdio.h>
+    #include <string.h>
+    typedef struct test
+    {
+      int a;
+      int b;
+    } test;
+    int main()
+    {
+      test test1, test2, test3, test4;
+      test1.a = 10;
+      test1.b = 20;
+      test3.a = 10;
+      test3.b = 20;
+      char buf[30] = {0};
+      printf("test1.a is %d\n", test1.a);
+      printf("test1.b is %d\n", test1.b);
+      memcpy(&test2, &test1, sizeof(test));
+      printf("test2.a is %d\n", test2.a);
+      printf("test2.b is %d\n", test2.b);
+    memcpy(buf, &test3, sizeof(test));
+      memcpy(&test4, buf, sizeof(test));
+      printf("test4.a is %d\n", test4.a);
+      printf("test4.b is %d\n", test4.b);
+      return 1;
+    }
+
+--------------------------------------------------
+ 
+文章来源: chenyu.blog.csdn.net，作者：chen.yu，版权归原作者所有，如需转载，请联系作者。
+
+原文链接：chenyu.blog.csdn.net/article/details/89629672
+
+--------------------------------------------------
+EOF
